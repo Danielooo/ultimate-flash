@@ -12,18 +12,18 @@
 :root{
   --bg:#eef2f5; --surface:#ffffff; --ink:#14212b; --muted:#566673;
   --line:#c9d4dc; --court:#1f5fa8; --accent:#f2b705; --good:#1e8a4c; --bad:#c2402a;
-  --figure:#14212b; --hand:#1f5fa8;
+  --figure:#14212b; --hand:#1f5fa8; --skin:#efc2a8; --skin-line:#c98f74;
   --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
   --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0f171d; --surface:#18232c; --ink:#e7eef3; --muted:#9db0bd;
   --line:#2c3b47; --court:#6fa8ea; --accent:#f5c534; --good:#4cc782; --bad:#f07a63;
-  --figure:#e7eef3; --hand:#6fa8ea; color-scheme:dark}}
+  --figure:#7d91a2; --hand:#6fa8ea; --skin:#efc2a8; --skin-line:#d9a084; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0f171d; --surface:#18232c; --ink:#e7eef3; --muted:#9db0bd;
   --line:#2c3b47; --court:#6fa8ea; --accent:#f5c534; --good:#4cc782; --bad:#f07a63;
-  --figure:#e7eef3; --hand:#6fa8ea; color-scheme:dark}
+  --figure:#7d91a2; --hand:#6fa8ea; --skin:#efc2a8; --skin-line:#d9a084; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
@@ -47,7 +47,7 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .q{font-family:var(--display);font-weight:800;font-size:1.9rem;line-height:1.1;margin:0;text-wrap:balance}
 .situ{font-size:1.15rem;margin:0}
 .fig{display:flex;justify-content:center}
-.fig svg{width:min(100%,260px);height:auto}
+.fig svg{width:min(100%,320px);height:auto}
 .answer{border-top:2px dashed var(--line);padding-top:12px;display:grid;gap:8px}
 .answer .name{font-family:var(--display);font-weight:800;font-size:1.8rem;line-height:1.1;color:var(--court)}
 .answer p{margin:0}
@@ -70,13 +70,19 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .progress i.cur{outline:2px solid var(--accent);outline-offset:1px}
 footer{color:var(--muted);font-size:.9rem;display:grid;gap:6px}
 footer a{color:var(--court)}
-.fig .f{stroke:var(--figure);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;fill:none}
-.fig .h{fill:var(--hand);stroke:var(--hand)}
-.fig .head{fill:var(--surface);stroke:var(--figure);stroke-width:6}
-.fig .mv{stroke:var(--accent);stroke-width:4;fill:none;stroke-linecap:round;stroke-dasharray:2 7}
+.fig .arm{stroke:var(--skin-line);stroke-width:13;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.fig .leg{stroke:var(--figure);stroke-width:15;stroke-linecap:round;fill:none}
+.fig .jersey{fill:var(--court)}
+.fig .shorts{fill:var(--figure)}
+.fig .head{fill:var(--skin);stroke:var(--skin-line);stroke-width:4}
+.fig .mv{stroke:var(--accent);stroke-width:5;fill:none;stroke-linecap:round;stroke-dasharray:2 8}
 .fig .ar{fill:var(--accent)}
-.fig .lineout{stroke:var(--muted);stroke-width:3;stroke-dasharray:8 6}
-.fig text{fill:var(--muted);font:600 13px var(--display);letter-spacing:.06em;text-transform:uppercase}
+.fig .lineout{stroke:var(--muted);stroke-width:4;stroke-dasharray:10 7}
+.fig text{fill:var(--muted);font:600 15px var(--display);letter-spacing:.06em;text-transform:uppercase}
+.close{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.close figure{margin:0;display:grid;justify-items:center;gap:4px;max-width:150px;padding:10px 8px;border:2px solid var(--line);border-radius:8px;background:var(--bg)}
+.close svg{width:72px;height:72px}
+.close figcaption{font-size:.85rem;line-height:1.25;text-align:center;color:var(--muted)}
 @media (prefers-reduced-motion:no-preference){.card{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px);opacity:.6}}}
 </style>
 </head>
@@ -107,42 +113,79 @@ footer a{color:var(--court)}
   <footer>
     <p>Gebaren getekend naar de beschrijvingen in de WFDF Rules of Ultimate 2025–2028 (Appendix). Vergelijk ze met het officiële plaatjesblad:
       <a href="https://rules.wfdf.sport/wp-content/uploads/2025/03/WFDF-Rules-of-Ultimate-2025-2028-Hand-Signals-1-page.pdf" target="_blank" rel="noopener">WFDF Hand Signals (1 pagina)</a>.
-      Indoor-getallen komen uit de EUF Indoor Rules Appendix. Controleer voor de NL-competitie altijd het actuele reglement van Frisbee Nederland.</p>
+      Handen: Microsoft Fluent Emoji (MIT-licentie). Indoor-getallen komen uit de EUF Indoor Rules Appendix. Controleer voor de NL-competitie altijd het actuele reglement van Frisbee Nederland.</p>
   </footer>
 </div>
 
 <script>
-/* ---------- Tekenfuncties voor de gebaren ---------- */
-const BODY = `<circle class="head" cx="100" cy="46" r="17"/>
-  <path class="f" d="M100 63 V140 M100 140 L80 205 M100 140 L120 205 M86 74 H114"/>`;
-const arm = d => `<path class="f" d="${d}"/>`;
-const fist = (x,y) => `<circle class="h" cx="${x}" cy="${y}" r="8"/>`;
-const palm = (x,y,rot=0) => `<ellipse class="h" cx="${x}" cy="${y}" rx="5" ry="11" transform="rotate(${rot} ${x} ${y})"/>`;
+/* ---------- Tekenfuncties voor de gebaren ----------
+   Handen: Microsoft Fluent Emoji (MIT-licentie), zodat vingers en handvorm herkenbaar zijn. */
+const HANDS = {"raised-fist":{"body":"<g fill=\"none\"><path fill=\"#eebfaa\" d=\"m28.992 16.738l.008.005C29 21.33 26.373 30 16.114 30C3.9 30 3.964 19.017 4.004 12.105l.004-.527A3 3 0 0 1 4 11.36V8.188c0-2.7 2.125-3.459 3.188-3.5c1.074 0 1.782.274 2.251.598c.593-1.715 1.974-2.093 2.754-2.13c1.864 0 2.83.871 3.117 1.401c.616-2.069 2.237-2.515 3.138-2.557c2.193 0 3.208 1.575 3.505 2.328q.018.047.035.116c.402-2.16 1.684-2.335 2.898-2.335c2.192 0 3.348 1.938 3.348 3.266c0 .391 0 .967-.002 1.61c-.002 1.538-.006 3.46.002 4.156c.005.351.006.912.006 1.488c.738 1.332.787 2.916.752 4.109\"/><path fill=\"#d6a089\" d=\"M23.008 5.188c0-1.748.502-2.603.922-2.947c-1.116.205-2.07.99-2.07 3.868c0 1.3.027 2.628.049 3.496c-3.812.126-5.123 1.24-5.565 2.36V5.886c0-2.134.484-3.198.9-3.64C16.17 2.68 15 3.803 15 6.54v4.116c0 .596.047 1.112.132 1.559c-.102 1.021-.601 2.393-2.94 2.393c-.63 0-1.4-.315-2.008-.945v-7.49c0-.986.106-1.74.261-2.31c-.7.561-1.289 1.58-1.289 3.398v3.665c0 1.085.35 1.93.848 2.535c-.444.617-1.278 1.147-2.816 1.147c-.962 0-2.795-.87-3.134-2.612c.046 1.063.649 4.972 3.333 4.972c1.426 0 2.28-.5 2.725-1.063c.286.563 1.344 1.063 2.656 1.063c1.46 0 2.53-1.063 2.53-1.063s.757.684 1.783.954c-2.251.715-4.73 1.999-6.81 4.286a.5.5 0 1 0 .74.672c2.508-2.758 5.654-3.962 8.194-4.475a18.3 18.3 0 0 1 3.17-.355q.345-.007.602-.002c.258.534.447 1.153.628 1.745c.375 1.224.714 2.331 1.551 2.331q.166 0 .328-.015c.785-.277 1.453-.895 1.453-1.75c0-2.058-1.325-3.766-4.55-3.766c-4.196 0-4.293-1.65-4.293-2.969c0-2.796 6.656-2.421 6.656-2.421a6.6 6.6 0 0 0-1.25-.517q-.24-.018-.492-.025z\"/></g>"},"raised-hand":{"body":"<g fill=\"none\"><path fill=\"#eebfaa\" d=\"M7.017 7.29c1.297 0 1.686.71 1.686.71l.094-1.828c.078-.96 1.2-1.913 2.251-1.913c1.436 0 1.983 1.038 1.983 1.038c-.094-2.203.703-3.304 2.68-3.304c1.601.1 2.26 1.624 2.133 3.304c0 0 .672-1.313 2.53-1.147c1.047.093 1.892 1.147 1.892 2.912l-.188 7.688s1.19-1.723 2.078-2.234c.888-.512 2.354-.48 3.079.29c.851.905 1.006 2.323.395 3.187c-2.286 2.944-4.474 6.226-5.146 7.585c-1.792 3.627-4.53 6.429-8.195 6.429c-4.445 0-8.553-3.257-9.039-9.195c-.486-5.937-.548-10.803-.548-10.803c-.08-1.047.743-2.719 2.315-2.719\"/><path fill=\"#d6a089\" d=\"m13.952 4.499l.531 7.773a.5.5 0 0 1-.998.069l-.484-7.096l.03.052c-.088-2.079.615-3.176 2.356-3.293v.012c-.477-.004-.834.22-1.084.635c-.262.434-.401 1.08-.351 1.848m3.892.798q.009-.13.013-.26a5.5 5.5 0 0 0-.263 1.555V6.6l-.125 6.14a.5.5 0 1 0 1 .021l.125-6.137c.026-.772.203-1.42.489-1.859c.237-.364.543-.58.932-.629c-1.587.02-2.171 1.162-2.171 1.162m-7.808 12.326c1.163-.083 2.956-.192 4.77-.108c1.232.057 2.437.202 3.45.486c-.51.17-1.125.404-1.794.713c-1.82.842-4.074 2.264-5.735 4.577a.5.5 0 1 0 .812.583c1.526-2.125 3.616-3.453 5.343-4.252a16.4 16.4 0 0 1 2.172-.825a12 12 0 0 1 .81-.213l.04-.009l.01-.002h.001a.5.5 0 0 0 .146-.929c-1.382-.758-3.352-1.042-5.209-1.128c-1.876-.087-3.717.026-4.888.11a.5.5 0 0 0 .072.997M8.704 7.98l.093-1.808c.077-.95 1.179-1.894 2.22-1.913c-.45.073-.75.204-.952.356a1.2 1.2 0 0 0-.414.557c-.181.477-.156 1.118-.061 1.89l.865 6.434a.5.5 0 1 1-.991.133z\"/></g>"},"rightwards-hand":{"body":"<g fill=\"none\"><path fill=\"#eebfaa\" d=\"M24.734 25.156c0-1.281-.859-1.945-.859-1.945h1.922c1.038 0 1.969-1.001 1.969-2.04c0-1.952-1.157-2.28-1.157-2.28s.907-.016 1.688-.157c.781-.14 1.734-1.133 1.734-2.172c0-1.943-1.539-2.68-3.218-2.554c0 0 1.062-.649 1.062-2.055c0-1.038-.984-2.492-2.898-2.32l-7.555.36s1.567-1.038 2.078-1.915s.488-2.19-.281-2.906c-.905-.842-2.323-.995-3.188-.391c-2.593 1.813-5.982 4.385-7.562 4.875c-4.031 1.25-6.451 4.906-6.451 8.313c0 4.109 3.098 8.423 7.873 8.765l12.125.711c1.047.078 2.718-.734 2.718-2.289\"/><path fill=\"#d6a089\" fill-rule=\"evenodd\" d=\"M19.773 6.142c-.07.476-.283.983-.773 1.358c-1.053.806-4 2.5-4 2.5l2.47-.04c.265-.181 1.572-1.096 2.03-1.882a2.67 2.67 0 0 0 .273-1.936m4.425 20.39l-2.421-.11h-.002c-4.365-.195-8.27-.37-12.666-.8c-4.184-.41-6.322-5.242-7.089-7.464c.094 4.052 3.17 8.239 7.87 8.576l12.126.711c.672.05 1.603-.267 2.182-.913M20.49 18l9.1-.184c-.35.483-.849.839-1.293.919c-.392.07-.816.11-1.14.13L20.51 19a.5.5 0 1 1-.02-1m7.163-5H19.5a.5.5 0 0 0 0 1h7.325a2.46 2.46 0 0 0 .828-1m-.254 1h-.462q.234-.012.462 0m-.36 7.98c.265-.058.464-.117.612-.172c-.279.776-1.033 1.403-1.854 1.403h-.723l-6.583-.121a.5.5 0 0 1 .018-1s6.66.3 8.53-.11\" clip-rule=\"evenodd\"/></g>"},"leftwards-hand":{"body":"<g fill=\"none\"><path fill=\"#eebfaa\" d=\"M7.266 25.156c0-1.281.859-1.945.859-1.945H6.203c-1.038 0-1.969-1.001-1.969-2.04c0-1.952 1.157-2.28 1.157-2.28s-.907-.016-1.688-.157c-.781-.14-1.734-1.133-1.734-2.172c0-1.943 1.539-2.68 3.218-2.554c0 0-1.062-.649-1.062-2.055c0-1.038.984-2.492 2.898-2.32l7.555.36S13.011 8.954 12.5 8.077s-.489-2.19.281-2.906c.905-.842 2.323-.995 3.188-.391c2.594 1.813 5.982 4.385 7.562 4.875c4.032 1.25 6.451 4.906 6.451 8.313c0 4.109-3.098 8.423-7.873 8.765l-12.125.711c-1.046.078-2.718-.734-2.718-2.289\"/><path fill=\"#d6a089\" fill-rule=\"evenodd\" d=\"M12.227 6.143c.07.475.283.982.773 1.357c.716.548 2.31 1.508 3.254 2.065l.691.403L17 10l2.004 1.171a.5.5 0 0 1 .169.701l-.23.361l-.043.067l-.003.004l-.3.47A4.85 4.85 0 0 0 18 15.062c0 1.123.435 2.399 1.82 3.553a.5.5 0 0 1-.64.768C17.565 18.04 17 16.481 17 15.063c0-1.147.368-2.18.808-2.924l-3.27-2.179h-.007l-.172-.12l-.003-.002a12 12 0 0 1-.809-.626c-.405-.343-.825-.754-1.047-1.134a2.67 2.67 0 0 1-.273-1.935m-4.425 20.39q1.237-.058 2.421-.11h.002c4.365-.196 8.27-.37 12.666-.8c4.184-.41 6.322-5.243 7.089-7.465c-.094 4.052-3.17 8.239-7.87 8.576l-12.126.711c-.672.05-1.603-.267-2.182-.913M11.51 18l-9.1-.183c.35.482.849.838 1.293.918c.392.07.816.11 1.14.13L11.49 19a.5.5 0 0 0 .02-1m-7.163-5H12.5a.5.5 0 0 1 0 1H5.175a2.46 2.46 0 0 1-.828-1m.254 1h.462a5 5 0 0 0-.462 0m.36 7.98a5 5 0 0 1-.613-.172c.28.776 1.034 1.403 1.855 1.403h.723l6.583-.121a.5.5 0 0 0-.018-1s-6.66.3-8.53-.11\" clip-rule=\"evenodd\"/></g>"},"palm-up-hand":{"body":"<g fill=\"none\"><path fill=\"#d6a089\" d=\"M21 15.433v-.792a2 2 0 0 0-4 0v.62a2 2 0 0 0-3.428 1.845l1.042 3.89a2 2 0 0 0 3.412.827a1.995 1.995 0 0 0 2.455-.403a2 2 0 0 0 3.306-.936l1.664-6.208a2 2 0 0 0-3.863-1.036z\"/><path fill=\"#eebfaa\" d=\"M2.024 18.648c0-4.148 1.696-6.308 5.315-9.56a6 6 0 0 1 3.905-1.444h3.175c.386 0 .755.016 1.02-.266a2.33 2.33 0 0 1 3.564.194l.069.092a2.426 2.426 0 0 1-.23 3.175l-.615.612a4.1 4.1 0 0 1-2.899 1.197h-.551a2.72 2.72 0 0 0-2.46 1.555l-.021.046a2.8 2.8 0 0 0-.271 1.203v.196a3 3 0 0 0 3 3h5.186a2 2 0 0 0 1.396-.568l4.256-4.148a2.422 2.422 0 1 1 3.288 3.555l-6.428 5.64a6 6 0 0 1-3.958 1.49h-9.56c-3.311 0-7.18-1.821-7.18-5.969\"/></g>"},"palm-down-hand":{"body":"<g fill=\"none\"><path fill=\"#d6a089\" d=\"M14.614 10.262a2 2 0 0 1 3.412-.828a1.995 1.995 0 0 1 2.455.403a2 2 0 0 1 3.306.936l1.664 6.21a2 2 0 0 1-3.863 1.034L21 15.825v.792a2 2 0 0 1-4 0v-.62a2 2 0 0 1-3.428-1.846z\"/><path fill=\"#eebfaa\" d=\"M2.024 12.61c0 4.147 1.696 6.308 5.315 9.559a6 6 0 0 0 3.905 1.444h3.175c.386 0 .755-.015 1.02.267a2.33 2.33 0 0 0 3.564-.195l.069-.092a2.426 2.426 0 0 0-.23-3.174l-.615-.613a4.1 4.1 0 0 0-2.899-1.197h-.551a2.72 2.72 0 0 1-2.46-1.554l-.021-.047a2.8 2.8 0 0 1-.271-1.202v-.197a3 3 0 0 1 3-3h5.186a2 2 0 0 1 1.396.568l4.256 4.149a2.422 2.422 0 1 0 3.288-3.555l-6.428-5.64a6 6 0 0 0-3.958-1.49h-9.56c-3.311 0-7.18 1.82-7.18 5.968\"/></g>"},"oncoming-fist":{"body":"<g fill=\"none\"><path fill=\"#d6a089\" d=\"m27 26.899l-7.625 2.648c-2.422.922-4.828-.14-5.422-2.781c-.788-2.285.216-4.843 2.5-5.631l7.626-2.649c2.284-.788 4.878.461 5.666 2.746c.78 2.384-.46 4.878-2.745 5.666\"/><path fill=\"#eebfaa\" d=\"M25.922 6.297c-.983 0-2.266.203-3.281 0c-.733-.147-2.235-1.313-4.063-1.313c-2.259 0-2.984 1.72-6.062 1.579c-1.455-.067-3.428.375-4.578 1.75c-.94 1.123-2.799 1.327-3.844 1.937C2.794 10.95 2 12.6 2 14.1v6.681c0 3.282.781 4.922 3.594 5.219C7.926 26.246 8.5 24.606 9 24.406c.156 1 1.563 2.594 3.063 2.594c2.234 0 2.903-.631 3.703-1.531c.718 1.61 2.075 2.468 3.375 2.468c2.659 0 3.109-1.062 3.906-2.468c.8.9 1.96 1.453 3.36 1.453c1.984 0 3.577-1.844 3.577-4.344L29.8 10.7c0-2.5-1.378-4.403-3.878-4.403\"/><path fill=\"#d6a089\" d=\"M4.212 25.47q.195.19.395.348c-1.848-.518-2.5-1.918-2.594-4.354a548 548 0 0 1 .002-7.727a4.84 4.84 0 0 1 1.02-2.59c-.036 3.908-.064 10.717.02 12.168c.04.704.495 1.508 1.157 2.156m6.773.691c.257.32.535.6.81.821c-1.396-.172-2.648-1.637-2.795-2.577l-.031.015a4 4 0 0 1-.144-1.046c0-.485-.003-1.162-.007-1.952c-.01-2.047-.023-4.847.007-6.992a.5.5 0 0 1 1 .014c-.03 2.135-.017 4.914-.007 6.96c.004.794.007 1.477.007 1.97c0 .884.477 1.936 1.16 2.787m7.442 1.69a5.6 5.6 0 0 1-.672-.706c-.683-.85-1.16-1.903-1.16-2.787c0-.447-.002-1.236-.005-2.213c-.01-2.871-.026-7.365.005-9.577a.5.5 0 1 0-1-.014c-.03 2.222-.015 6.739-.006 9.609c.004.971.006 1.754.006 2.195c0 .37.06.746.163 1.118l.008-.008c.587 1.315 1.6 2.13 2.66 2.383m6.252-1.69q.284.352.585.628a4.27 4.27 0 0 1-2.192-1.294c-.336-.679-.553-1.413-.553-2.121c0-.455-.002-1.205-.006-2.117c-.01-2.584-.024-6.474.007-8.671a.5.5 0 1 1 1 .014c-.031 2.187-.017 6.054-.007 8.638c.004.918.006 1.674.006 2.136c0 .884.477 1.936 1.16 2.787\"/></g>"}};
+const R = d => d * Math.PI / 180;
+/* Plaats een hand: (x,y) = pols, a = richting van de vingers in graden (0 = naar rechts). */
+function hand(name, x, y, a = 0, size = 46, opt = {}){
+  const s = size / 32, off = opt.off ?? 0.42;
+  const cx = x + Math.cos(R(a)) * size * off, cy = y + Math.sin(R(a)) * size * off;
+  let rot = a, flip = "";
+  if (name === "flat"){ if (Math.cos(R(a)) >= -0.01){ name = "rightwards-hand"; } else { name = "leftwards-hand"; rot = a - 180; } }
+  else if (opt.base !== undefined){ rot = a - opt.base; }
+  if (opt.mirror) flip = " scale(-1 1)";
+  return `<g transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)}) rotate(${rot})${flip} scale(${s})"><g transform="translate(-16 -16)">${HANDS[name].body}</g></g>`;
+}
+const BODY = `<g class="body">
+  <path class="leg" d="M108 168 L96 250 M132 168 L144 250"/>
+  <rect class="shorts" x="98" y="150" width="44" height="26" rx="6"/>
+  <path class="jersey" d="M98 86 H142 Q148 86 148 94 V156 H92 V94 Q92 86 98 86 Z"/>
+  <circle class="head" cx="120" cy="56" r="22"/></g>`;
+const arm = d => `<path class="arm" d="${d}"/>`;
 const move = d => `<path class="mv" d="${d}"/>`;
-const tip = (x,y,rot) => `<path class="ar" d="M0 -7 L12 0 L0 7 Z" transform="translate(${x} ${y}) rotate(${rot})"/>`;
-const svg = inner => `<svg viewBox="0 0 200 220" role="img">${BODY}${inner}</svg>`;
+const tip = (x,y,rot) => `<path class="ar" d="M0 -8 L14 0 L0 8 Z" transform="translate(${x} ${y}) rotate(${rot})"/>`;
+const label = (x,y,t,anchor="start") => `<text x="${x}" y="${y}" text-anchor="${anchor}">${t}</text>`;
+const svg = (inner, back = "") => `<svg viewBox="0 -44 240 300" role="img">${back}${BODY}${inner}</svg>`;
+const ang = (x1,y1,x2,y2) => Math.atan2(y2-y1, x2-x1) * 180 / Math.PI;
 
 const FIG = {
-  foul: svg(arm("M114 74 L186 74") + palm(190,74,90) +
-            arm("M86 74 L140 50 L152 84") + palm(154,90,-20) +
-            move("M168 40 L170 62") + tip(170,66,85)),
-  violation: svg(arm("M86 74 L52 14") + fist(48,8) + arm("M114 74 L148 14") + fist(152,8)),
-  goal: svg(arm("M86 74 L72 12") + palm(71,7) + arm("M114 74 L128 12") + palm(129,7)),
-  inb: svg(`<path class="lineout" d="M14 10 V215"/><text x="20" y="212">zijlijn</text><text x="150" y="212">veld</text>` +
-           arm("M114 74 L182 112") + palm(186,114,-60) + arm("M86 74 L80 135")),
-  outb: svg(`<path class="lineout" d="M30 10 V215"/><text x="36" y="212">zijlijn</text><text x="150" y="212">veld</text>` +
-           arm("M86 74 L18 92") + palm(12,93,75) + arm("M114 74 L120 135")),
-  timeout: svg(arm("M114 74 L152 92 L152 36") + palm(152,30) +
-               arm("M86 74 L120 100 L150 22") + `<path class="f" d="M128 17 L176 17" style="stroke:var(--hand)"/>`),
-  contest: svg(arm("M86 74 L130 160") + palm(133,166) + arm("M114 74 L70 160") + palm(67,166) +
-               move("M40 178 Q100 205 160 178") + tip(160,178,-25)),
-  travel: svg(arm("M86 74 L74 104 L94 92") + fist(98,92) + arm("M114 74 L126 108 L106 110") + fist(102,112) +
-              move("M130 86 A30 30 0 1 1 128 120") + tip(127,123,110)),
-  pick: svg(arm("M86 74 L88 112 L58 108") + `<path class="h" d="M38 106 Q48 94 60 106 Z"/>` +
-            arm("M114 74 L112 112 L142 108") + `<path class="h" d="M140 106 Q152 94 162 106 Z"/>`),
-  stall: svg(arm("M114 74 L140 52 L116 30") + palm(112,28,-60) + arm("M86 74 L80 135") +
-             move("M130 14 L122 22") + move("M140 22 L130 28"))
+  foul: svg(arm("M140 94 L198 94") + hand("flat",198,94,0) +
+            arm("M100 94 L156 50 L170 70") + hand("flat",170,70,ang(156,50,170,70),44) +
+            move("M206 30 L200 58") + tip(199,62,100)),
+  violation: svg(arm("M100 94 L64 26") + hand("raised-fist",64,26,ang(100,94,64,26),46,{base:-90}) +
+                 arm("M140 94 L176 26") + hand("raised-fist",176,26,ang(140,94,176,26),46,{base:-90})),
+  goal: svg(arm("M100 94 L76 18") + hand("rightwards-hand",76,18,-90,48,{base:0}) +
+            arm("M140 94 L164 18") + hand("leftwards-hand",164,18,-90,48,{base:180})),
+  inb: svg(arm("M140 94 L198 124") + hand("flat",198,124,ang(140,94,198,124)) + arm("M100 94 L92 160"),
+           `<path class="lineout" d="M16 -40 V252"/>` + label(24,248,"zijlijn") + label(232,248,"veld","end")),
+  outb: svg(arm("M100 94 L44 112") + hand("flat",44,112,ang(100,94,44,112)) + arm("M140 94 L148 160"),
+           `<path class="lineout" d="M60 -40 V252"/>` + label(54,248,"zijlijn","end") + label(232,248,"veld","end")),
+  timeout: svg(arm("M140 94 L170 160 L128 166") + hand("rightwards-hand",124,160,-90,56,{base:0,off:0.4}) +
+               arm("M100 94 L66 120 L92 104") + hand("rightwards-hand",92,104,0,56,{base:0,off:0.45})),
+  contest: svg(arm("M100 94 L156 174") + hand("flat",156,174,ang(100,94,156,174),42) +
+               arm("M140 94 L84 174") + hand("flat",84,174,ang(140,94,84,174),42) +
+               move("M40 226 Q120 256 200 226") + tip(202,224,-22)),
+  travel: svg(arm("M100 94 L84 132 L108 124") + hand("oncoming-fist",112,122,0,40,{off:0}) +
+              arm("M140 94 L158 146 L134 148") + hand("oncoming-fist",128,148,0,40,{off:0}) +
+              move("M168 104 A34 34 0 1 1 164 170") + tip(162,173,115)),
+  pick: svg(arm("M100 94 L98 140 L66 136") + hand("palm-up-hand",66,136,180,56,{base:0,mirror:true,off:0.3}) +
+            arm("M140 94 L142 140 L174 136") + hand("palm-up-hand",174,136,0,56,{base:0,off:0.3})),
+  stall: svg(arm("M140 94 L196 70 L170 40") + hand("flat",170,40,200,52,{off:0.42}) + arm("M100 94 L92 160") +
+             move("M118 -14 L122 0") + move("M140 -18 L138 -4") + move("M100 -6 L108 4"))
 };
+/* Close-ups van de handvorm per gebaar: [hand, draaiing, spiegelen, uitleg] */
+const CLOSE = {
+  foul: [["rightwards-hand",0,0,"Platte hand aan gestrekte arm"],["rightwards-hand",55,0,"Andere onderarm hakt erover"]],
+  violation: [["raised-fist",0,0,"Gebalde vuisten, armen in een V"]],
+  goal: [["rightwards-hand",-90,0,"Open hand, vingers omhoog"],["leftwards-hand",90,0,"Handpalmen naar elkaar"]],
+  inb: [["rightwards-hand",0,0,"Platte hand, duim tegen de vingers, naar het veld"]],
+  outb: [["leftwards-hand",0,0,"Platte hand, duim tegen de vingers, weg van het veld"]],
+  timeout: [["T",0,0,"Platte hand bovenop een rechtopstaande hand: een T"]],
+  contest: [["rightwards-hand",60,0,"Open handen, armen kruisen omlaag"]],
+  travel: [["oncoming-fist",0,0,"Vuisten draaien om elkaar"]],
+  pick: [["palm-up-hand",0,0,"Handpalmen omhoog, ellebogen tegen je lijf"]],
+  stall: [["leftwards-hand",-30,0,"Open hand tikt op je hoofd"]]
+};
+const T_SHAPE = `<g transform="translate(16 21) rotate(-90) scale(.62) translate(-16 -16)">${HANDS["rightwards-hand"].body}</g><g transform="translate(16 8) scale(.62) translate(-16 -16)">${HANDS["rightwards-hand"].body}</g>`;
+const closeups = f => `<div class="close">` + CLOSE[f].map(([n,r,m,t]) => n === "T"
+  ? `<figure><svg viewBox="0 0 32 32" aria-hidden="true">${T_SHAPE}</svg><figcaption>${t}</figcaption></figure>` :
+  `<figure><svg viewBox="0 0 32 32" aria-hidden="true"><g transform="translate(16 16) rotate(${r})${m?" scale(-1 1)":""} translate(-16 -16)">${HANDS[n].body}</g></svg><figcaption>${t}</figcaption></figure>`).join("") + `</div>`;
 
 /* ---------- De kaarten ---------- */
 const DECKS = {
@@ -157,7 +200,7 @@ const DECKS = {
      when:"De disc of de speler was binnen de lijnen.", tip:"Platte hand, duim tegen de vingers. Richting het veld = in."},
     {fig:"outb", name:"Out (buiten)", what:"Gestrekte arm met platte hand, wijzend weg van het veld.",
      when:"De disc of de speler was buiten de lijnen.", tip:"Zelfde hand als 'in', alleen de richting verschilt: weg van het veld = out."},
-    {fig:"timeout", name:"Time-out", what:"Maak een T met je handen (of met hand en disc).",
+    {fig:"timeout", name:"Time-out", what:"Maak een T: een platte hand horizontaal bovenop de vingertoppen van je andere, rechtopstaande hand (of gebruik de disc als bovenkant).",
      when:"Je team vraagt een time-out aan. Tijdens het spel mag alleen de werper met de disc in de hand dat doen.", tip:"Indoor zijn er minder time-outs dan buiten. Kijk in het toernooireglement hoeveel je er hebt."},
     {fig:"contest", name:"Contest", what:"Beide armen gestrekt omlaag, voor je lichaam kruisend zwaaien.",
      when:"Je bent het niet eens met de call van een tegenstander.", tip:"Bij contest gaat de disc meestal terug naar de werper die hem het laatst had."},
@@ -165,7 +208,7 @@ const DECKS = {
      when:"De werper verplaatst zijn pivotvoet of loopt te veel stappen na het vangen.", tip:"Draaiende vuisten = draaiende voeten. Zo onthoud je het."},
     {fig:"pick", name:"Pick", what:"Onderarmen naar voren, ellebogen tegen je lichaam, handpalmen omhoog.",
      when:"Je wordt als verdediger gehinderd door een andere speler terwijl je je tegenstander bewaakt.", tip:"Indoor op een klein veld gebeurt dit vaak. Het spel stopt en jij mag je achterstand inhalen."},
-    {fig:"stall", name:"Stall", what:"Tik met een open hand op je hoofd.",
+    {fig:"stall", name:"Stall", what:"Tik met een open, platte hand bovenop je hoofd.",
      when:"De marker heeft de telling afgemaakt (indoor: 8) voordat de werper de disc losliet.", tip:"Stall is een turnover. Werper oneens? Dan contest, en de telling gaat verder op 6."}
   ],
   calls: [
@@ -222,7 +265,7 @@ function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.rando
 
 /* ---------- Tekenen van het scherm ---------- */
 function front(c){
-  if (c.fig) return `<div class="kicker">Welk gebaar is dit?</div><div class="fig">${FIG[c.fig]}</div>`;
+  if (c.fig) return `<div class="kicker">Welk gebaar is dit?</div><div class="fig">${FIG[c.fig]}</div>${closeups(c.fig)}`;
   return `<div class="kicker">${state.deck === "calls" ? "Situatie: welke call maak je?" : "Indoor-regel"}</div><p class="q">${c.q}</p>`;
 }
 function back(c){

@@ -18,3 +18,4 @@ Kaarten die je nog niet kent komen vaker terug. Je voortgang wordt in je browser
 - Controleer voor de Nederlandse competitie altijd het actuele reglement van Frisbee Nederland.
 
 De gebaren zijn eigen tekeningen op basis van de officiële beschrijvingen; vergelijk ze met het officiële WFDF-plaatjesblad.
+De handen komen uit [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) (MIT-licentie).
