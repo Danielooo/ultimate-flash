@@ -68,6 +68,16 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .progress i.cur{outline:2px solid var(--accent);outline-offset:1px}
 footer{color:var(--muted);font-size:.9rem;display:grid;gap:6px}
 footer a{color:var(--court)}
+.sig{display:flex;justify-content:center}
+.sig img,.grid img{background:#fff;border-radius:8px;border:2px solid var(--line)}
+.sig img{width:min(100%,300px);height:auto;aspect-ratio:1}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.grid figure{margin:0;display:grid;gap:6px;align-content:start;min-width:0}
+.grid img{width:100%;height:auto;aspect-ratio:1}
+.grid figcaption{display:grid;gap:2px;font-size:.85rem;line-height:1.3}
+.grid figcaption span,.grid .row span{color:var(--muted)}
+.grid .row{grid-column:1/-1;display:grid;gap:2px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.answer .num{display:inline-grid;place-items:center;min-width:1.6em;height:1.6em;border-radius:4px;background:var(--court);color:var(--surface);font-size:.8em;margin-right:4px;vertical-align:.1em}
 @media (prefers-reduced-motion:no-preference){.card{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px);opacity:.6}}}
 </style>
 </head>
@@ -76,17 +86,19 @@ footer a{color:var(--court)}
 <div class="wrap">
   <header>
     <h1>Frisbee <span>Flashcards</span></h1>
-    <p>Leer de calls en de regels van indoor ultimate. Geen scheidsrechter in de zaal: jij maakt de call.</p>
+    <p>Leer de gebaren, calls en regels van indoor ultimate. Geen scheidsrechter in de zaal: jij maakt de call.</p>
   </header>
 
   <nav class="tabs" aria-label="Stapel kiezen">
-    <button id="t-calls" data-deck="calls" aria-pressed="true">Wanneer call je?</button>
+    <button id="t-gebaren" data-deck="gebaren" aria-pressed="true">Gebaren</button>
+    <button id="t-calls" data-deck="calls" aria-pressed="false">Wanneer call je?</button>
     <button id="t-indoor" data-deck="indoor" aria-pressed="false">Indoor-regels</button>
   </nav>
 
   <div class="modes">
     <button id="m-learn" data-mode="learn" aria-pressed="true">Leren</button>
     <button id="m-quiz" data-mode="quiz" aria-pressed="false">Quiz</button>
+    <button id="m-all" data-mode="all" aria-pressed="false">Overzicht</button>
     <span class="stat" id="stat"></span>
   </div>
 
@@ -95,7 +107,7 @@ footer a{color:var(--court)}
   <article class="card" id="card" aria-live="polite"></article>
 
   <footer>
-    <p><b>Gebaren leren?</b> Gebruik het officiële plaatjesblad van WFDF:
+    <p>Gebarenplaatjes: WFDF Rules of Ultimate – Hand Signals. Het origineel:
       <a href="https://rules.wfdf.sport/wp-content/uploads/2025/03/WFDF-Rules-of-Ultimate-2025-2028-Hand-Signals-1-page.pdf" target="_blank" rel="noopener">WFDF Hand Signals (1 pagina)</a>.</p>
     <p>Regels: WFDF Rules of Ultimate 2025–2028. Indoor-getallen komen uit de EUF Indoor Rules Appendix. Controleer voor de NL-competitie altijd het actuele reglement van Frisbee Nederland.</p>
   </footer>
@@ -105,6 +117,32 @@ footer a{color:var(--court)}
 
 /* ---------- De kaarten ---------- */
 const DECKS = {
+  gebaren: [
+    {img:1, name:"Foul", what:"Hak met je hand op de onderarm van je andere arm, die voor je lichaam ligt.", when:"Er is contact dat niet mag: bij het gooien, vangen of verdedigen."},
+    {img:2, name:"Violation", what:"Beide armen omhoog in een V, met gebalde vuisten.", when:"Een regelovertreding zonder contact.", tip:"Vuisten in een V = violation. Gestrekte armen met de vingers omhoog = goal."},
+    {img:3, name:"Goal", what:"Beide armen helemaal gestrekt recht omhoog, handpalmen naar elkaar.", when:"De disc is gevangen in de endzone: punt!"},
+    {img:4, name:"Contest", what:"Vuisten met de knokkels tegen elkaar voor je borst.", when:"Je bent het niet eens met de call van een tegenstander.", tip:"Botsende vuisten = botsende meningen."},
+    {img:5, name:"Accepted", what:"Onderarmen naar voren, open handen met de handpalmen omhoog.", when:"Je accepteert de call van de tegenstander (geen contest)."},
+    {img:6, name:"Retracted", what:"Armen laag voor je lichaam gekruist en dan naar buiten zwaaien.", when:"Je trekt je eigen call in."},
+    {img:7, name:"In / Out-of-bounds / Out of end zone", what:"Gestrekte arm met platte hand: wijs naar het veld (in) of weg van het veld (out).", when:"De disc of speler was binnen of buiten de lijnen, of buiten de endzone."},
+    {img:8, name:"Disc Down", what:"Wijs met je wijsvinger naar de grond, arm langs je lichaam.", when:"De disc is niet gevangen (de grond geraakt)."},
+    {img:9, name:"Disc Up", what:"Wijsvinger omhoog, hand voor je borst.", when:"De disc is wél gevangen."},
+    {img:10, name:"Pick", what:"Beide armen omhoog met de ellebogen in een hoek van 90°, gebalde vuisten (als een doel).", when:"Je wordt als verdediger gehinderd door een andere speler.", tip:"Indoor op een klein veld gebeurt dit vaak."},
+    {img:11, name:"Travel", what:"Gebalde vuisten in een verticale cirkel om elkaar heen draaien.", when:"De werper verplaatst zijn pivotvoet of loopt te veel stappen na het vangen.", tip:"Draaiende vuisten = draaiende voeten."},
+    {img:12, name:"Marking Infraction", what:"Beide armen gestrekt opzij, met gebalde vuisten.", when:"De marker maakt een fout: fast count, disc space, double team, straddle, wrapping of vision blokkeren.", tip:"Vergelijk met Female Matching (20): daar zijn de handen open."},
+    {img:13, name:"Turnover", what:"Arm naar voren en draai je hand om, zodat je vingers naar beneden wijzen.", when:"Het balbezit wisselt (de disc gaat naar de andere ploeg)."},
+    {img:14, name:"Timing Violation", what:"Tik met een platte hand bovenop je hoofd.", when:"Een tijdregel is overschreden, bijvoorbeeld te traag klaar voor de pull.", tip:"Vergelijk met Did not affect the play (23): daar beweegt de hand omhoog, weg van je hoofd."},
+    {img:15, name:"Pulling Violation (vroeger Offside / False Start)", what:"Onderarmen gekruist boven je hoofd (een X).", when:"Een speler stond niet goed opgesteld of vertrok te vroeg bij de pull.", tip:"Sinds de WFDF-appendix van 2026 heet dit 'Pulling Violation'."},
+    {img:16, name:"Time-out", what:"Maak een T: platte hand horizontaal op de vingertoppen van je andere, rechtopstaande hand.", when:"Je team vraagt een time-out aan. Tijdens het spel mag alleen de werper met de disc dat."},
+    {img:17, name:"Spirit Stoppage", what:"Een T, maar met de horizontale onderarm bovenop en de rechtopstaande hand aan het uiteinde.", when:"Je legt het spel stil om iets over spirit of gedrag te bespreken.", tip:"Vergelijk goed met Time-out (16)."},
+    {img:18, name:"Stoppage", what:"Armen boven je hoofd, handen raken elkaar (een boog).", when:"Het spel ligt stil, bijvoorbeeld voor een blessure of een technische stop."},
+    {img:19, name:"Gender Ratio: Male Matching", what:"Beide handen achter je hoofd, ellebogen naar buiten.", when:"Mixed: het volgende punt speel je met de meeste mannen (male matching)."},
+    {img:20, name:"Gender Ratio: Female Matching", what:"Beide armen gestrekt opzij, handen open.", when:"Mixed: het volgende punt speel je met de meeste vrouwen (female matching).", tip:"Vergelijk met Marking Infraction (12): daar zijn het vuisten."},
+    {img:21, name:"Play has stopped", what:"Armen gekruist boven je hoofd en dan naar buiten zwaaien.", when:"Je laat iedereen weten dat het spel stilligt, zodat niemand doorspeelt."},
+    {img:22, name:"Who made the call", what:"Eén arm opzij en de andere voor je borst: je wijst de kant aan (aanval of verdediging).", when:"Je laat zien welke ploeg de call maakte."},
+    {img:23, name:"Did not affect the play", what:"Platte hand boven je hoofd en omhoog bewegen.", when:"De overtreding had geen invloed op het spel: het resultaat blijft staan."},
+    {img:24, name:"Match Point", what:"Eén arm schuin omhoog gestrekt, de andere onderarm voor je borst.", when:"Het volgende punt kan de wedstrijd beslissen."}
+  ],
   calls: [
     {q:"Je verdediger slaat tegen je arm terwijl je gooit. De worp mislukt.", name:"Foul (door de verdediger)", why:"Contact tijdens de worp is een foul. Roep 'Foul'. Onbetwist: jij houdt de disc.", tip:"Was de worp toch gelukt en gevangen? Dan gaat het spel gewoon door."},
     {q:"Een tegenstander vangt de disc en zet daarna nog drie stappen.", name:"Travel", why:"Na het vangen moet je zo snel mogelijk stoppen. Iedere tegenstander mag 'Travel' roepen.", tip:"Het spel stopt niet. De werper zet zijn pivot terug en de telling gaat door."},
@@ -136,11 +174,15 @@ const DECKS = {
   ]
 };
 
+/* ---------- Plaatjes: WFDF Rules of Ultimate, Hand Signals ---------- */
+const IMGS = ["img/signals/signal-01.jpg", "img/signals/signal-02.jpg", "img/signals/signal-03.jpg", "img/signals/signal-04.jpg", "img/signals/signal-05.jpg", "img/signals/signal-06.jpg", "img/signals/signal-07.jpg", "img/signals/signal-08.jpg", "img/signals/signal-09.jpg", "img/signals/signal-10.jpg", "img/signals/signal-11.jpg", "img/signals/signal-12.jpg", "img/signals/signal-13.jpg", "img/signals/signal-14.jpg", "img/signals/signal-15.jpg", "img/signals/signal-16.jpg", "img/signals/signal-17.jpg", "img/signals/signal-18.jpg", "img/signals/signal-19.jpg", "img/signals/signal-20.jpg", "img/signals/signal-21.jpg", "img/signals/signal-22.jpg", "img/signals/signal-23.jpg", "img/signals/signal-24.jpg"];
+const imgSrc = n => IMGS[n-1];
+
 /* ---------- Spelstatus ---------- */
 const STORE = "frisbee-flashcards-v1";
 let saved = {};
 try { saved = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch(e) {}
-const state = {deck: (saved.deck && saved.deck in DECKS) ? saved.deck : "calls", mode: saved.mode || "learn", boxes: saved.boxes || {}, idx: 0, revealed: false, quiz: null, score: {right:0, total:0}};
+const state = {deck: (saved.deck && saved.deck in DECKS) ? saved.deck : "gebaren", mode: saved.mode || "learn", boxes: saved.boxes || {}, idx: 0, revealed: false, quiz: null, score: {right:0, total:0}};
 const save = () => { try { localStorage.setItem(STORE, JSON.stringify({deck:state.deck, mode:state.mode, boxes:state.boxes})); } catch(e) {} };
 const key = i => state.deck + ":" + i;
 const box = i => state.boxes[key(i)] || 0;
@@ -159,9 +201,11 @@ function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.rando
 
 /* ---------- Tekenen van het scherm ---------- */
 function front(c){
+  if (c.img) return `<div class="kicker">Welk gebaar is dit?</div><div class="sig"><img src="${imgSrc(c.img)}" alt="Handgebaar, raad welk"></div>`;
   return `<div class="kicker">${state.deck === "calls" ? "Situatie: welke call maak je?" : "Indoor-regel"}</div><p class="q">${c.q}</p>`;
 }
 function back(c){
+  if (c.img) return `<div class="answer"><div class="name"><span class="num">${c.img}</span> ${c.name}</div><p><b>Gebaar:</b> ${c.what}</p><p><b>Wanneer:</b> ${c.when}</p>${c.tip?`<p class="tip">${c.tip}</p>`:""}</div>`;
   return `<div class="answer"><div class="name">${c.name}</div><p>${c.why}</p><p class="tip">${c.tip}</p></div>`;
 }
 
@@ -175,6 +219,15 @@ function render(){
     ? `Score ${state.score.right}/${state.score.total}`
     : `${known} van ${list.length} gekend`;
 
+  if (state.mode === "all"){
+    $("progress").innerHTML = "";
+    $("stat").textContent = `${list.length} kaarten`;
+    $("card").innerHTML = `<div class="court"></div><div class="face"><div class="kicker">Alle kaarten</div><div class="grid">` +
+      list.map(x => x.img
+        ? `<figure><img src="${imgSrc(x.img)}" alt=""><figcaption><b>${x.img}. ${x.name}</b><span>${x.when}</span></figcaption></figure>`
+        : `<div class="row"><b>${x.name}</b><span>${x.q}</span></div>`).join("") + `</div></div>`;
+    return;
+  }
   let html = `<div class="court"></div><div class="face">${front(c)}`;
   if (state.mode === "learn"){
     html += state.revealed ? back(c) : "";
