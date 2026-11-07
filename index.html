@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Frisbee Flashcards</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: a sporthal-vloer. Eén kaart in het midden, zoals de disc op de middenstip; tabs bovenaan als het scorebord. */
+:root{
+  --bg:#eef2f5; --surface:#ffffff; --ink:#14212b; --muted:#566673;
+  --line:#c9d4dc; --court:#1f5fa8; --accent:#f2b705; --good:#1e8a4c; --bad:#c2402a;
+  --figure:#14212b; --hand:#1f5fa8;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f171d; --surface:#18232c; --ink:#e7eef3; --muted:#9db0bd;
+  --line:#2c3b47; --court:#6fa8ea; --accent:#f5c534; --good:#4cc782; --bad:#f07a63;
+  --figure:#e7eef3; --hand:#6fa8ea; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f171d; --surface:#18232c; --ink:#e7eef3; --muted:#9db0bd;
+  --line:#2c3b47; --court:#6fa8ea; --accent:#f5c534; --good:#4cc782; --bad:#f07a63;
+  --figure:#e7eef3; --hand:#6fa8ea; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:640px;margin:0 auto;display:grid;gap:18px}
+header h1{font-family:var(--display);font-weight:800;font-size:2.6rem;line-height:1;margin:0;letter-spacing:.01em;text-transform:uppercase}
+header h1 span{color:var(--court)}
+header p{margin:6px 0 0;color:var(--muted);max-width:60ch}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button,.modes button{font:600 1.05rem var(--display);letter-spacing:.04em;text-transform:uppercase;
+  border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 12px;border-radius:4px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--court);border-color:var(--court);color:#fff}
+.modes{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.modes button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 -3px 0 var(--accent)}
+.modes .stat{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--muted);font-size:.95rem}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:10px;min-height:400px;display:grid;
+  grid-template-rows:auto 1fr auto;overflow:hidden;position:relative}
+.card .court{height:8px;background:linear-gradient(90deg,var(--court) 0 18%,transparent 18% 82%,var(--court) 82%)}
+.face{padding:18px;display:grid;gap:12px;align-content:start;min-width:0}
+.kicker{font:600 .9rem var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.q{font-family:var(--display);font-weight:800;font-size:1.9rem;line-height:1.1;margin:0;text-wrap:balance}
+.situ{font-size:1.15rem;margin:0}
+.fig{display:flex;justify-content:center}
+.fig svg{width:min(100%,260px);height:auto}
+.answer{border-top:2px dashed var(--line);padding-top:12px;display:grid;gap:8px}
+.answer .name{font-family:var(--display);font-weight:800;font-size:1.8rem;line-height:1.1;color:var(--court)}
+.answer p{margin:0}
+.answer .tip{background:color-mix(in srgb,var(--accent) 18%,transparent);border-left:4px solid var(--accent);padding:8px 10px;border-radius:0 6px 6px 0}
+.actions{display:flex;gap:8px;padding:14px 18px;border-top:2px solid var(--line);flex-wrap:wrap}
+.btn{flex:1 1 140px;font:700 1rem var(--body);padding:12px;border-radius:6px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--court);border-color:var(--court);color:#fff}
+.btn.good{border-color:var(--good);color:var(--good)}
+.btn.bad{border-color:var(--bad);color:var(--bad)}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:420px){.choices{grid-template-columns:1fr}}
+.choice{font:700 1rem var(--body);text-align:left;padding:12px;border-radius:6px;border:2px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.choice.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 15%,var(--surface))}
+.choice.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 15%,var(--surface))}
+.progress{display:flex;gap:3px}
+.progress i{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.progress i.b1{background:color-mix(in srgb,var(--good) 40%,var(--line))}
+.progress i.b2{background:color-mix(in srgb,var(--good) 70%,var(--line))}
+.progress i.b3{background:var(--good)}
+.progress i.cur{outline:2px solid var(--accent);outline-offset:1px}
+footer{color:var(--muted);font-size:.9rem;display:grid;gap:6px}
+footer a{color:var(--court)}
+.fig .f{stroke:var(--figure);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.fig .h{fill:var(--hand);stroke:var(--hand)}
+.fig .head{fill:var(--surface);stroke:var(--figure);stroke-width:6}
+.fig .mv{stroke:var(--accent);stroke-width:4;fill:none;stroke-linecap:round;stroke-dasharray:2 7}
+.fig .ar{fill:var(--accent)}
+.fig .lineout{stroke:var(--muted);stroke-width:3;stroke-dasharray:8 6}
+.fig text{fill:var(--muted);font:600 13px var(--display);letter-spacing:.06em;text-transform:uppercase}
+@media (prefers-reduced-motion:no-preference){.card{animation:in .25s ease-out}@keyframes in{from{transform:translateY(6px);opacity:.6}}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Frisbee <span>Flashcards</span></h1>
+    <p>Leer de gebaren en de calls van indoor ultimate. Geen scheidsrechter in de zaal: jij maakt de call.</p>
+  </header>
+
+  <nav class="tabs" aria-label="Stapel kiezen">
+    <button id="t-gebaren" data-deck="gebaren" aria-pressed="true">Gebaren</button>
+    <button id="t-calls" data-deck="calls" aria-pressed="false">Wanneer call je?</button>
+    <button id="t-indoor" data-deck="indoor" aria-pressed="false">Indoor-regels</button>
+  </nav>
+
+  <div class="modes">
+    <button id="m-learn" data-mode="learn" aria-pressed="true">Leren</button>
+    <button id="m-quiz" data-mode="quiz" aria-pressed="false">Quiz</button>
+    <span class="stat" id="stat"></span>
+  </div>
+
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <article class="card" id="card" aria-live="polite"></article>
+
+  <footer>
+    <p>Gebaren getekend naar de beschrijvingen in de WFDF Rules of Ultimate 2025–2028 (Appendix). Vergelijk ze met het officiële plaatjesblad:
+      <a href="https://rules.wfdf.sport/wp-content/uploads/2025/03/WFDF-Rules-of-Ultimate-2025-2028-Hand-Signals-1-page.pdf" target="_blank" rel="noopener">WFDF Hand Signals (1 pagina)</a>.
+      Indoor-getallen komen uit de EUF Indoor Rules Appendix. Controleer voor de NL-competitie altijd het actuele reglement van Frisbee Nederland.</p>
+  </footer>
+</div>
+
+<script>
+/* ---------- Tekenfuncties voor de gebaren ---------- */
+const BODY = `<circle class="head" cx="100" cy="46" r="17"/>
+  <path class="f" d="M100 63 V140 M100 140 L80 205 M100 140 L120 205 M86 74 H114"/>`;
+const arm = d => `<path class="f" d="${d}"/>`;
+const fist = (x,y) => `<circle class="h" cx="${x}" cy="${y}" r="8"/>`;
+const palm = (x,y,rot=0) => `<ellipse class="h" cx="${x}" cy="${y}" rx="5" ry="11" transform="rotate(${rot} ${x} ${y})"/>`;
+const move = d => `<path class="mv" d="${d}"/>`;
+const tip = (x,y,rot) => `<path class="ar" d="M0 -7 L12 0 L0 7 Z" transform="translate(${x} ${y}) rotate(${rot})"/>`;
+const svg = inner => `<svg viewBox="0 0 200 220" role="img">${BODY}${inner}</svg>`;
+
+const FIG = {
+  foul: svg(arm("M114 74 L186 74") + palm(190,74,90) +
+            arm("M86 74 L140 50 L152 84") + palm(154,90,-20) +
+            move("M168 40 L170 62") + tip(170,66,85)),
+  violation: svg(arm("M86 74 L52 14") + fist(48,8) + arm("M114 74 L148 14") + fist(152,8)),
+  goal: svg(arm("M86 74 L72 12") + palm(71,7) + arm("M114 74 L128 12") + palm(129,7)),
+  inb: svg(`<path class="lineout" d="M14 10 V215"/><text x="20" y="212">zijlijn</text><text x="150" y="212">veld</text>` +
+           arm("M114 74 L182 112") + palm(186,114,-60) + arm("M86 74 L80 135")),
+  outb: svg(`<path class="lineout" d="M30 10 V215"/><text x="36" y="212">zijlijn</text><text x="150" y="212">veld</text>` +
+           arm("M86 74 L18 92") + palm(12,93,75) + arm("M114 74 L120 135")),
+  timeout: svg(arm("M114 74 L152 92 L152 36") + palm(152,30) +
+               arm("M86 74 L120 100 L150 22") + `<path class="f" d="M128 17 L176 17" style="stroke:var(--hand)"/>`),
+  contest: svg(arm("M86 74 L130 160") + palm(133,166) + arm("M114 74 L70 160") + palm(67,166) +
+               move("M40 178 Q100 205 160 178") + tip(160,178,-25)),
+  travel: svg(arm("M86 74 L74 104 L94 92") + fist(98,92) + arm("M114 74 L126 108 L106 110") + fist(102,112) +
+              move("M130 86 A30 30 0 1 1 128 120") + tip(127,123,110)),
+  pick: svg(arm("M86 74 L88 112 L58 108") + `<path class="h" d="M38 106 Q48 94 60 106 Z"/>` +
+            arm("M114 74 L112 112 L142 108") + `<path class="h" d="M140 106 Q152 94 162 106 Z"/>`),
+  stall: svg(arm("M114 74 L140 52 L116 30") + palm(112,28,-60) + arm("M86 74 L80 135") +
+             move("M130 14 L122 22") + move("M140 22 L130 28"))
+};
+
+/* ---------- De kaarten ---------- */
+const DECKS = {
+  gebaren: [
+    {fig:"foul", name:"Foul", what:"Eén arm gestrekt opzij, met de andere onderarm hak je over de gestrekte arm heen.",
+     when:"Er is contact dat niet mag: bij het gooien, vangen of verdedigen.", tip:"Roep 'Foul!' hardop en maak het gebaar, zodat je teamgenoten en het publiek weten waarom het spel stilligt."},
+    {fig:"violation", name:"Violation", what:"Beide armen omhoog in een V, met gebalde vuisten.",
+     when:"Een regelovertreding zonder contact, bijvoorbeeld een herhaalde marking-overtreding.", tip:"Vuisten = violation. Open handen omhoog betekent juist een goal."},
+    {fig:"goal", name:"Goal (punt)", what:"Beide armen recht omhoog, handpalmen naar elkaar toe.",
+     when:"De disc is gevangen in de endzone.", tip:"Open handen, armen evenwijdig. Niet verwarren met de V met vuisten."},
+    {fig:"inb", name:"In (binnen)", what:"Gestrekte arm met platte hand, wijzend naar het veld.",
+     when:"De disc of de speler was binnen de lijnen.", tip:"Platte hand, duim tegen de vingers. Richting het veld = in."},
+    {fig:"outb", name:"Out (buiten)", what:"Gestrekte arm met platte hand, wijzend weg van het veld.",
+     when:"De disc of de speler was buiten de lijnen.", tip:"Zelfde hand als 'in', alleen de richting verschilt: weg van het veld = out."},
+    {fig:"timeout", name:"Time-out", what:"Maak een T met je handen (of met hand en disc).",
+     when:"Je team vraagt een time-out aan. Tijdens het spel mag alleen de werper met de disc in de hand dat doen.", tip:"Indoor zijn er minder time-outs dan buiten. Kijk in het toernooireglement hoeveel je er hebt."},
+    {fig:"contest", name:"Contest", what:"Beide armen gestrekt omlaag, voor je lichaam kruisend zwaaien.",
+     when:"Je bent het niet eens met de call van een tegenstander.", tip:"Bij contest gaat de disc meestal terug naar de werper die hem het laatst had."},
+    {fig:"travel", name:"Travel", what:"Gebalde vuisten in een verticale cirkel om elkaar heen draaien.",
+     when:"De werper verplaatst zijn pivotvoet of loopt te veel stappen na het vangen.", tip:"Draaiende vuisten = draaiende voeten. Zo onthoud je het."},
+    {fig:"pick", name:"Pick", what:"Onderarmen naar voren, ellebogen tegen je lichaam, handpalmen omhoog.",
+     when:"Je wordt als verdediger gehinderd door een andere speler terwijl je je tegenstander bewaakt.", tip:"Indoor op een klein veld gebeurt dit vaak. Het spel stopt en jij mag je achterstand inhalen."},
+    {fig:"stall", name:"Stall", what:"Tik met een open hand op je hoofd.",
+     when:"De marker heeft de telling afgemaakt (indoor: 8) voordat de werper de disc losliet.", tip:"Stall is een turnover. Werper oneens? Dan contest, en de telling gaat verder op 6."}
+  ],
+  calls: [
+    {q:"Je verdediger slaat tegen je arm terwijl je gooit. De worp mislukt.", name:"Foul (door de verdediger)", why:"Contact tijdens de worp is een foul. Roep 'Foul'. Onbetwist: jij houdt de disc.", tip:"Was de worp toch gelukt en gevangen? Dan gaat het spel gewoon door."},
+    {q:"Een tegenstander vangt de disc en zet daarna nog drie stappen.", name:"Travel", why:"Na het vangen moet je zo snel mogelijk stoppen. Iedere tegenstander mag 'Travel' roepen.", tip:"Het spel stopt niet. De werper zet zijn pivot terug en de telling gaat door."},
+    {q:"De marker telt: 'Stall één… twee-drie-vier…' veel te snel.", name:"Fast count", why:"Dit is een marking-overtreding. Tussen de cijfers hoort minstens één seconde.", tip:"De marker moet de telling corrigeren. Gebeurt het opnieuw, dan wordt het een violation."},
+    {q:"Twee verdedigers staan binnen 3 meter van de werper.", name:"Double team", why:"Maar één verdediger mag de werper markeren.", tip:"Valt onder de marking-overtredingen, net als fast count en disc space."},
+    {q:"De marker staat zo dicht op je dat er geen disc tussen past.", name:"Disc space", why:"Tussen marker en werper hoort minstens één discdiameter ruimte.", tip:"Indoor is het veld klein en staat de marker vaak dicht op je. Toch blijft deze regel gelden."},
+    {q:"Je bewaakt je tegenstander, maar een andere aanvaller loopt in je route en je kunt niet verder.", name:"Pick", why:"Je wordt gehinderd door een speler die niet bij jouw duel hoort.", tip:"Roep meteen 'Pick'. Het spel stopt en je mag je positie weer innemen."},
+    {q:"De marker telt '…zeven, acht' en de werper heeft de disc nog vast.", name:"Stall (turnover)", why:"Indoor tel je tot 8. Disc nog vast bij 'acht' is een turnover.", tip:"Werper vindt dat hij op tijd was? Dan contest, en de telling gaat verder op 6."},
+    {q:"Je springt om de disc te vangen. Een verdediger duwt je weg voordat de disc er is.", name:"Foul (receiving foul)", why:"Contact dat het vangen beïnvloedt, is een foul.", tip:"Onbetwist: jij krijgt de disc op de plek van de foul."},
+    {q:"Je vangt de disc, maar een verdediger slaat hem daarna uit je handen.", name:"Strip", why:"Een strip is een foul waarbij je de disc door contact verliest nadat je hem al had.", tip:"Onbetwist: het telt alsof je hem hebt gevangen."},
+    {q:"Een aanvaller rent al de verdediging in voordat de pull is losgelaten.", name:"Pulling violation", why:"Bij de pull moeten spelers achter hun lijn blijven tot de disc is losgelaten.", tip:"Sinds de WFDF-appendix van 2026 heet dit 'Pulling violation'. Vroeger heette het 'Offside'."},
+    {q:"Een tegenstander maakt een call die jij niet terecht vindt.", name:"Contest", why:"Je geeft aan dat je het oneens bent. Daarna praat je het kort en rustig uit.", tip:"Kom je er niet uit? Dan gaat de disc terug naar de laatste werper vóór de call."},
+    {q:"Een speler duikt met gestrekte benen recht op een stilstaande speler af.", name:"Dangerous play", why:"Gevaarlijk spel mag iedere speler callen, ook als er geen contact was.", tip:"Indoor is de vloer hard en staan de muren dichtbij. Veiligheid gaat voor."},
+    {q:"Je teamgenoot ligt op de grond en kan niet verder.", name:"Injury", why:"Een blessure-call stopt het spel meteen.", tip:"De geblesseerde speler mag gewisseld worden."},
+    {q:"Jij hebt de disc en je team heeft even pauze nodig om een tactiek te bespreken.", name:"Time-out", why:"Tijdens het spel mag alleen de werper met de disc een time-out vragen.", tip:"Maak een T met je handen en roep 'Time-out'."},
+    {q:"Je ziet dat een tegenstander de verkeerde regel toepast, maar het spel is al voorbij.", name:"Geen call: bespreek het in de Spirit-cirkel", why:"Calls maak je tijdens het spel. Uitleg en tips horen na de wedstrijd in de spirit-cirkel.", tip:"Zo blijft de wedstrijd vlot en leer je samen de regels."}
+  ],
+  indoor: [
+    {q:"Met hoeveel spelers per team sta je indoor in het veld?", name:"5 spelers", why:"Een team moet er minstens 4 hebben om te mogen spelen.", tip:"Buiten speel je met 7. Dat maakt indoor sneller en drukker."},
+    {q:"Tot hoeveel telt de marker indoor?", name:"Tot 8", why:"Buiten tel je tot 10. Indoor is het veld kleiner, dus de telling is korter.", tip:"Tussen elk cijfer zit minstens één seconde."},
+    {q:"Werper betwist een stall. Op welk getal gaat de telling verder?", name:"Op 6", why:"Indoor ga je na een betwiste stall verder op 6 (buiten op 8).", tip:"Altijd twee lager dan het maximum."},
+    {q:"Na een onbetwiste overtreding door de aanval (bijvoorbeeld travel). Wat is de hoogste telling bij herstart?", name:"Maximaal 7", why:"De telling gaat verder waar hij was, maar komt niet hoger dan 7 (buiten 9).", tip:"Eén onder het maximum van 8."},
+    {q:"Na een onbetwiste foul door de verdediging. Waar gaat de telling verder?", name:"Op 1", why:"Wie een foul maakt, mag er geen voordeel van hebben. De telling begint opnieuw.", tip:"Net als buiten."},
+    {q:"Na alle andere calls (zoals een betwiste foul). Wat is de hoogste telling bij herstart?", name:"Maximaal 5", why:"De telling gaat verder op het getal waar hij was, maar komt niet hoger dan 5.", tip:"Buiten is dit maximaal 6."},
+    {q:"Hoeveel spelers mag een team maximaal op de selectie hebben (EUF indoor)?", name:"Maximaal 16", why:"Minimaal 10 en maximaal 16 spelers op het EK indoor.", tip:"Voor de NL-competitie kan dit anders zijn. Kijk in het reglement van je toernooi."},
+    {q:"Welke regels gelden indoor in Nederland?", name:"WFDF-regels + indoor-aanpassingen", why:"De basis zijn de WFDF Rules of Ultimate 2025–2028. Voor indoor komen daar aanpassingen bij, zoals in de EUF Indoor Appendix.", tip:"Frisbee Nederland (voorheen NFB) maakt per competitie een reglement. Lees dat vóór het seizoen."},
+    {q:"Wie is de scheidsrechter in een ultimate-wedstrijd?", name:"De spelers zelf", why:"Ultimate draait op Spirit of the Game: je kent de regels, maakt eerlijke calls en respecteert je tegenstander.", tip:"Na de wedstrijd geef je de tegenstander een spiritscore."},
+    {q:"Wat doe je na de wedstrijd met de tegenstander?", name:"Spiritscore + spirit-cirkel", why:"Je geeft punten (0–4) op vijf onderdelen: regelkennis, fouten en contact, eerlijkheid, houding en communicatie.", tip:"In de spirit-cirkel bespreek je samen het spel. Ook een goed moment om regelvragen te stellen."}
+  ]
+};
+
+/* ---------- Spelstatus ---------- */
+const STORE = "frisbee-flashcards-v1";
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch(e) {}
+const state = {deck: saved.deck || "gebaren", mode: saved.mode || "learn", boxes: saved.boxes || {}, idx: 0, revealed: false, quiz: null, score: {right:0, total:0}};
+const save = () => { try { localStorage.setItem(STORE, JSON.stringify({deck:state.deck, mode:state.mode, boxes:state.boxes})); } catch(e) {} };
+const key = i => state.deck + ":" + i;
+const box = i => state.boxes[key(i)] || 0;
+const cards = () => DECKS[state.deck];
+const $ = id => document.getElementById(id);
+
+/* Kies de volgende kaart: kaarten in een lagere box (minder goed gekend) komen vaker terug. */
+function pickNext(){
+  const list = cards();
+  const weights = list.map((_,i) => (i === state.idx && list.length > 1) ? 0 : [8,4,2,1][box(i)]);
+  let r = Math.random() * weights.reduce((a,b)=>a+b,0);
+  for (let i=0;i<list.length;i++){ r -= weights[i]; if (r <= 0) return i; }
+  return 0;
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+/* ---------- Tekenen van het scherm ---------- */
+function front(c){
+  if (c.fig) return `<div class="kicker">Welk gebaar is dit?</div><div class="fig">${FIG[c.fig]}</div>`;
+  return `<div class="kicker">${state.deck === "calls" ? "Situatie: welke call maak je?" : "Indoor-regel"}</div><p class="q">${c.q}</p>`;
+}
+function back(c){
+  if (c.fig) return `<div class="answer"><div class="name">${c.name}</div><p><b>Gebaar:</b> ${c.what}</p><p><b>Wanneer:</b> ${c.when}</p><p class="tip">${c.tip}</p></div>`;
+  return `<div class="answer"><div class="name">${c.name}</div><p>${c.why}</p><p class="tip">${c.tip}</p></div>`;
+}
+
+function render(){
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.deck === state.deck));
+  document.querySelectorAll(".modes button").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === state.mode));
+  const list = cards(), c = list[state.idx];
+  $("progress").innerHTML = list.map((_,i)=>`<i class="b${box(i)}${i===state.idx?" cur":""}"></i>`).join("");
+  const known = list.filter((_,i)=>box(i)>=3).length;
+  $("stat").textContent = state.mode === "quiz"
+    ? `Score ${state.score.right}/${state.score.total}`
+    : `${known} van ${list.length} gekend`;
+
+  let html = `<div class="court"></div><div class="face">${front(c)}`;
+  if (state.mode === "learn"){
+    html += state.revealed ? back(c) : "";
+    html += `</div><div class="actions">` + (state.revealed
+      ? `<button class="btn bad" id="no">Nog niet</button><button class="btn good" id="yes">Wist ik</button>`
+      : `<button class="btn primary" id="flip">Draai kaart om</button>`) + `</div>`;
+  } else {
+    if (!state.quiz){
+      const others = shuffle(list.map((x,i)=>i).filter(i=>i!==state.idx)).slice(0,3);
+      state.quiz = {opts: shuffle([state.idx, ...others]), picked: null};
+    }
+    const q = state.quiz;
+    html += `<div class="choices">` + q.opts.map(i => {
+      let cls = "choice";
+      if (q.picked !== null){ if (i === state.idx) cls += " right"; else if (i === q.picked) cls += " wrong"; }
+      return `<button class="${cls}" data-opt="${i}" ${q.picked!==null?"disabled":""}>${list[i].name}</button>`;
+    }).join("") + `</div>`;
+    if (q.picked !== null) html += back(c);
+    html += `</div><div class="actions">` + (q.picked !== null ? `<button class="btn primary" id="next">Volgende kaart</button>` : `<span class="kicker" style="padding:12px 0">Kies het juiste antwoord</span>`) + `</div>`;
+  }
+  $("card").innerHTML = html;
+}
+
+function next(){ state.idx = pickNext(); state.revealed = false; state.quiz = null; render(); }
+function grade(ok){
+  const k = key(state.idx);
+  state.boxes[k] = ok ? Math.min(3, box(state.idx)+1) : 0;
+  save();
+}
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.deck){ state.deck = t.dataset.deck; state.idx = 0; state.score = {right:0,total:0}; save(); next(); return; }
+  if (t.dataset.mode){ state.mode = t.dataset.mode; save(); next(); return; }
+  if (t.id === "flip"){ state.revealed = true; render(); }
+  if (t.id === "yes"){ grade(true); next(); }
+  if (t.id === "no"){ grade(false); next(); }
+  if (t.id === "next") next();
+  if (t.dataset.opt !== undefined && state.quiz && state.quiz.picked === null){
+    const pick = +t.dataset.opt, ok = pick === state.idx;
+    state.quiz.picked = pick; state.score.total++; if (ok) state.score.right++;
+    grade(ok); render();
+  }
+});
+document.addEventListener("keydown", e => {
+  if (state.mode !== "learn") return;
+  if (e.key === " " && !state.revealed){ e.preventDefault(); state.revealed = true; render(); }
+  else if (state.revealed && (e.key === "ArrowRight" || e.key === "ArrowLeft")){ grade(e.key === "ArrowRight"); next(); }
+});
+
+state.idx = pickNext();
+render();
+</script>
+</body>
+</html>
